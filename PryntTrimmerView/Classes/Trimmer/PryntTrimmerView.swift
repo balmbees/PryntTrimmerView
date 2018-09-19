@@ -400,7 +400,7 @@ public protocol TrimmerViewDelegate: class {
         }
     }
     
-    func trimTime() -> (startTime: CMTime, endTime: CMTime)? {
+    public func trimTime() -> (startTime: CMTime, endTime: CMTime)? {
         guard let timeScale = asset?.duration.timescale,
             let startTime = self.startTime,
             let endTime = self.endTime else { return nil }
