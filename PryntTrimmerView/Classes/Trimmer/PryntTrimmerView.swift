@@ -35,7 +35,7 @@ public protocol TrimmerViewDelegate: class {
     /// The color of the handles on the side of the view
     @IBInspectable public var handleColor: UIColor = UIColor.gray {
         didSet {
-           updateHandleColor()
+            updateHandleColor()
         }
     }
 
@@ -46,6 +46,22 @@ public protocol TrimmerViewDelegate: class {
         }
     }
 
+    /// The Image of the handles on the side of the view
+    public var leftHandleImage: UIImage? {
+        didSet {
+            leftHandleKnob.image = leftHandleImage
+        }
+    }
+
+    public var rightHandleImage: UIImage? {
+        didSet {
+            rightHandleKnob.image = rightHandleImage
+        }
+    }
+
+    /// Seekbar handle when previous endTime is greater than current endTime
+    public var isNaturalSeekbarControl: Bool = true
+    private var sideConstraint: CGFloat?
     // MARK: Interface
 
     public weak var delegate: TrimmerViewDelegate?
@@ -56,8 +72,8 @@ public protocol TrimmerViewDelegate: class {
     private let leftHandleView = HandlerView()
     private let rightHandleView = HandlerView()
     private let positionBar = UIView()
-    private let leftHandleKnob = UIView()
-    private let rightHandleKnob = UIView()
+    private let leftHandleKnob = UIImageView()
+    private let rightHandleKnob = UIImageView()
     private let leftMaskView = UIView()
     private let rightMaskView = UIView()
 
@@ -72,14 +88,10 @@ public protocol TrimmerViewDelegate: class {
     private let handleWidth: CGFloat = 15
 
     /// The maximum duration allowed for the trimming. Change it before setting the asset, as the asset preview
-    public var maxDuration: Double = 15 {
-        didSet {
-            assetPreview.maxDuration = maxDuration
-        }
-    }
+    public var maxDuration: Double = Double.greatestFiniteMagnitude
 
     /// The minimum duration allowed for the trimming. The handles won't pan further if the minimum duration is attained.
-    public var minDuration: Double = 3
+    public var minDuration: Double = 1
 
     // MARK: - View & constraints configurations
 
@@ -135,8 +147,6 @@ public protocol TrimmerViewDelegate: class {
         leftHandleKnob.translatesAutoresizingMaskIntoConstraints = false
         leftHandleView.addSubview(leftHandleKnob)
 
-        leftHandleKnob.heightAnchor.constraint(equalTo: heightAnchor, multiplier: 0.5).isActive = true
-        leftHandleKnob.widthAnchor.constraint(equalToConstant: 2).isActive = true
         leftHandleKnob.centerYAnchor.constraint(equalTo: leftHandleView.centerYAnchor).isActive = true
         leftHandleKnob.centerXAnchor.constraint(equalTo: leftHandleView.centerXAnchor).isActive = true
 
@@ -153,8 +163,6 @@ public protocol TrimmerViewDelegate: class {
         rightHandleKnob.translatesAutoresizingMaskIntoConstraints = false
         rightHandleView.addSubview(rightHandleKnob)
 
-        rightHandleKnob.heightAnchor.constraint(equalTo: heightAnchor, multiplier: 0.5).isActive = true
-        rightHandleKnob.widthAnchor.constraint(equalToConstant: 2).isActive = true
         rightHandleKnob.centerYAnchor.constraint(equalTo: rightHandleView.centerYAnchor).isActive = true
         rightHandleKnob.centerXAnchor.constraint(equalTo: rightHandleView.centerXAnchor).isActive = true
     }
@@ -243,27 +251,53 @@ public protocol TrimmerViewDelegate: class {
             }
             layoutIfNeeded()
             if let startTime = startTime, isLeftGesture {
-                seek(to: startTime)
+                seek(to: startTime, isLeftGesture: isLeftGesture)
             } else if let endTime = endTime {
-                seek(to: endTime)
+                seek(to: endTime, isLeftGesture: isLeftGesture)
             }
             updateSelectedTime(stoppedMoving: false)
 
+            guard let startTime = startTime,
+                let endTime = endTime else { return }
+            let duration = (endTime - startTime).seconds
+            if duration > maxDuration, let sideConstraint = sideConstraint {
+                if isLeftGesture {
+                    rightConstraint?.constant -= sideConstraint
+                } else {
+                    leftConstraint?.constant += sideConstraint
+                }
+            }
+            layoutIfNeeded()
         case .cancelled, .ended, .failed:
             updateSelectedTime(stoppedMoving: true)
         default: break
         }
     }
 
+    private func isValidTranslation(isLeftGesture: Bool, with translation: CGPoint) -> Bool {
+        if isLeftGesture {
+            if currentLeftConstraint + translation.x > 0 { return true }
+        } else {
+            if currentRightConstraint + translation.x < 0 { return true }
+        }
+        return false
+    }
+
     private func updateLeftConstraint(with translation: CGPoint) {
         let maxConstraint = max(rightHandleView.frame.origin.x - handleWidth - minimumDistanceBetweenHandle, 0)
         let newConstraint = min(max(0, currentLeftConstraint + translation.x), maxConstraint)
+        if let constant = leftConstraint?.constant {
+            sideConstraint = constant - newConstraint
+        }
         leftConstraint?.constant = newConstraint
     }
 
     private func updateRightConstraint(with translation: CGPoint) {
         let maxConstraint = min(2 * handleWidth - frame.width + leftHandleView.frame.origin.x + minimumDistanceBetweenHandle, 0)
         let newConstraint = max(min(0, currentRightConstraint + translation.x), maxConstraint)
+        if let constant = rightConstraint?.constant {
+            sideConstraint = newConstraint - constant
+        }
         rightConstraint?.constant = newConstraint
     }
 
@@ -272,6 +306,10 @@ public protocol TrimmerViewDelegate: class {
     override func assetDidChange(newAsset: AVAsset?) {
         super.assetDidChange(newAsset: newAsset)
         resetHandleViewPosition()
+
+        guard let maxTranslation = maxTranslation(isLeftGesture: true) else { return }
+        updateRightConstraint(with: maxTranslation)
+        layoutIfNeeded()
     }
 
     private func resetHandleViewPosition() {
@@ -283,12 +321,11 @@ public protocol TrimmerViewDelegate: class {
     // MARK: - Time Equivalence
 
     /// Move the position bar to the given time.
-    public func seek(to time: CMTime) {
+    public func seek(to time: CMTime, isLeftGesture: Bool) {
         if let newPosition = getPosition(from: time) {
-
             let offsetPosition = newPosition - assetPreview.contentOffset.x - leftHandleView.frame.origin.x
             let maxPosition = rightHandleView.frame.origin.x - (leftHandleView.frame.origin.x + handleWidth)
-                              - positionBar.frame.width
+                - positionBar.frame.width
             let normalizedPosition = min(max(0, offsetPosition), maxPosition)
             positionConstraint?.constant = normalizedPosition
             layoutIfNeeded()
@@ -341,5 +378,40 @@ public protocol TrimmerViewDelegate: class {
     }
     public func scrollViewDidScroll(_ scrollView: UIScrollView) {
         updateSelectedTime(stoppedMoving: false)
+    }
+
+    func maxTranslation(isLeftGesture: Bool) -> CGPoint? {
+        guard let timeScale = asset?.duration.timescale,
+            let currentStartTime = startTime,
+            let currentEndTime = endTime,
+            (currentEndTime.seconds - currentStartTime.seconds) > maxDuration else { return nil }
+        if isLeftGesture {
+            let endSecond = currentStartTime.seconds + maxDuration
+            let endTime = CMTime(seconds: endSecond, preferredTimescale: timeScale)
+            let currentEndposition = getPosition(from: currentEndTime) ?? 0
+            let endPosition = getPosition(from: endTime) ?? 0
+            return CGPoint(x: endPosition - currentEndposition, y: 0)
+        } else {
+            let startSecond = currentEndTime.seconds - maxDuration
+            let startTime = CMTime(seconds: startSecond, preferredTimescale: timeScale)
+            let currentStartPosition = getPosition(from: currentStartTime) ?? 0
+            let startPosition = getPosition(from: startTime) ?? 0
+            return CGPoint(x: startPosition - currentStartPosition, y: 0)
+        }
+    }
+    
+    func trimTime() -> (startTime: CMTime, endTime: CMTime)? {
+        guard let timeScale = asset?.duration.timescale,
+            let startTime = self.startTime,
+            let endTime = self.endTime else { return nil }
+        let duration = (endTime - startTime).seconds
+        if duration < maxDuration {
+            return (startTime: startTime, endTime: endTime)
+        }
+        let overDuration = (duration - maxDuration) / 2
+        return (startTime: CMTime(seconds: startTime.seconds - overDuration,
+                                  preferredTimescale: timeScale),
+                endTime: CMTime(seconds: endTime.seconds - overDuration,
+                                preferredTimescale: timeScale))
     }
 }

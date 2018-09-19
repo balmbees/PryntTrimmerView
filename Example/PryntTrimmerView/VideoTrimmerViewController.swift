@@ -96,11 +96,11 @@ class VideoTrimmerViewController: AssetSelectionViewController {
         }
 
         let playBackTime = player.currentTime()
-        trimmerView.seek(to: playBackTime)
+        trimmerView.seek(to: playBackTime, isLeftGesture: true)
 
         if playBackTime >= endTime {
             player.seek(to: startTime, toleranceBefore: kCMTimeZero, toleranceAfter: kCMTimeZero)
-            trimmerView.seek(to: startTime)
+            trimmerView.seek(to: startTime, isLeftGesture: true)
         }
     }
 }
@@ -108,15 +108,11 @@ class VideoTrimmerViewController: AssetSelectionViewController {
 extension VideoTrimmerViewController: TrimmerViewDelegate {
     func positionBarStoppedMoving(_ playerTime: CMTime) {
         player?.seek(to: playerTime, toleranceBefore: kCMTimeZero, toleranceAfter: kCMTimeZero)
-        player?.play()
-        startPlaybackTimeChecker()
     }
 
     func didChangePositionBar(_ playerTime: CMTime) {
         stopPlaybackTimeChecker()
         player?.pause()
         player?.seek(to: playerTime, toleranceBefore: kCMTimeZero, toleranceAfter: kCMTimeZero)
-        let duration = (trimmerView.endTime! - trimmerView.startTime!).seconds
-        print(duration)
     }
 }

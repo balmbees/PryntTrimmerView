@@ -9,12 +9,12 @@
 /* Begin PBXBuildFile section */
 		0F189F446B41A22CFCFA1EE0 /* Pods_PryntTrimmerView_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0B2546D375231F430332EE5C /* Pods_PryntTrimmerView_Tests.framework */; };
 		24B4518A813C76B09F2F4A4B /* Pods_PryntTrimmerView_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2AF731B842FEC297C5E9A38 /* Pods_PryntTrimmerView_Example.framework */; };
+		481AC92921509C9600A7F67A /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 607FACD41AFB9204008FA782 /* Info.plist */; };
 		607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACD51AFB9204008FA782 /* AppDelegate.swift */; };
 		607FACDB1AFB9204008FA782 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 607FACD91AFB9204008FA782 /* Main.storyboard */; };
 		607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDC1AFB9204008FA782 /* Images.xcassets */; };
 		607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDE1AFB9204008FA782 /* LaunchScreen.xib */; };
 		BA05863A208FE16C004E868E /* PryntTrimmerView.h in Headers */ = {isa = PBXBuildFile; fileRef = BA05862C208FE161004E868E /* PryntTrimmerView.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		BA05863C208FE1ED004E868E /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = BA05863B208FE1ED004E868E /* Info.plist */; };
 		BA05863D208FE232004E868E /* AssetVideoScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA05862F208FE161004E868E /* AssetVideoScrollView.swift */; };
 		BA05863E208FE232004E868E /* AVAssetTimeSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA058630208FE161004E868E /* AVAssetTimeSelector.swift */; };
 		BA05863F208FE232004E868E /* ThumbSelectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA058631208FE161004E868E /* ThumbSelectorView.swift */; };
@@ -333,18 +333,18 @@
 				TargetAttributes = {
 					607FACCF1AFB9204008FA782 = {
 						CreatedOnToolsVersion = 6.3.1;
-						DevelopmentTeam = K59DXKG68T;
+						DevelopmentTeam = K5W42RHCL4;
 						LastSwiftMigration = 0900;
 					};
 					607FACE41AFB9204008FA782 = {
 						CreatedOnToolsVersion = 6.3.1;
-						DevelopmentTeam = K59DXKG68T;
+						DevelopmentTeam = K5W42RHCL4;
 						LastSwiftMigration = 0900;
 						TestTargetID = 607FACCF1AFB9204008FA782;
 					};
 					BA058622208FE042004E868E = {
 						CreatedOnToolsVersion = 9.3;
-						DevelopmentTeam = 9M5LJ68Y64;
+						DevelopmentTeam = K5W42RHCL4;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -374,7 +374,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BA05863C208FE1ED004E868E /* Info.plist in Resources */,
+				481AC92921509C9600A7F67A /* Info.plist in Resources */,
 				607FACDB1AFB9204008FA782 /* Main.storyboard in Resources */,
 				607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */,
 				607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */,
@@ -631,6 +631,7 @@
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Off;
+				SWIFT_VERSION = 4.0;
 			};
 			name = Debug;
 		};
@@ -679,6 +680,7 @@
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Off;
+				SWIFT_VERSION = 4.0;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
@@ -688,7 +690,7 @@
 			baseConfigurationReference = A4456BDD210B024D264D0888 /* Pods-PryntTrimmerView_Example.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = K59DXKG68T;
+				DEVELOPMENT_TEAM = K5W42RHCL4;
 				INFOPLIST_FILE = PryntTrimmerView/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -705,7 +707,7 @@
 			baseConfigurationReference = FB4D8D4A51CFFBB151546C59 /* Pods-PryntTrimmerView_Example.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = K59DXKG68T;
+				DEVELOPMENT_TEAM = K5W42RHCL4;
 				INFOPLIST_FILE = PryntTrimmerView/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -721,7 +723,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = A0E0C53092E03EC07C952C01 /* Pods-PryntTrimmerView_Tests.debug.xcconfig */;
 			buildSettings = {
-				DEVELOPMENT_TEAM = K59DXKG68T;
+				DEVELOPMENT_TEAM = K5W42RHCL4;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",
 					"$(inherited)",
@@ -743,7 +745,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FECE6EE3130FF8A1D6795BD8 /* Pods-PryntTrimmerView_Tests.release.xcconfig */;
 			buildSettings = {
-				DEVELOPMENT_TEAM = K59DXKG68T;
+				DEVELOPMENT_TEAM = K5W42RHCL4;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",
 					"$(inherited)",
@@ -771,7 +773,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 9M5LJ68Y64;
+				DEVELOPMENT_TEAM = K5W42RHCL4;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -804,7 +806,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 9M5LJ68Y64;
+				DEVELOPMENT_TEAM = K5W42RHCL4;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
