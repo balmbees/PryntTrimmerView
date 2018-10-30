@@ -85,7 +85,7 @@ public protocol TrimmerViewDelegate: class {
     private var rightConstraint: NSLayoutConstraint?
     private var positionConstraint: NSLayoutConstraint?
 
-    private let handleWidth: CGFloat = 15
+    public var handleWidth: CGFloat = 10
 
     /// The maximum duration allowed for the trimming. Change it before setting the asset, as the asset preview
     public var maxDuration: Double = Double.greatestFiniteMagnitude
