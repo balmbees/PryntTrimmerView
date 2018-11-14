@@ -399,7 +399,7 @@ public protocol TrimmerViewDelegate: class {
             return CGPoint(x: startPosition - currentStartPosition, y: 0)
         }
     }
-    
+
     public func trimTime() -> (startTime: CMTime, endTime: CMTime)? {
         guard let timeScale = asset?.duration.timescale,
             let startTime = self.startTime,
@@ -413,5 +413,10 @@ public protocol TrimmerViewDelegate: class {
                                   preferredTimescale: timeScale),
                 endTime: CMTime(seconds: endTime.seconds - overDuration,
                                 preferredTimescale: timeScale))
+    }
+
+    public func setTouchOffset(_ offset: CGFloat) {
+        leftHandleView.offset = offset
+        rightHandleView.offset = offset
     }
 }

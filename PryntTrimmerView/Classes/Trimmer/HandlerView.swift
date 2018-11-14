@@ -11,12 +11,14 @@ import UIKit
 
 class HandlerView: UIView {
 
+    var offset: CGFloat = -20
+
     override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
-        let hitFrame = bounds.insetBy(dx: -20, dy: -20)
+        let hitFrame = bounds.insetBy(dx: offset, dy: offset)
         return hitFrame.contains(point) ? self : nil
     }
     override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
-        let hitFrame = bounds.insetBy(dx: -20, dy: -20)
+        let hitFrame = bounds.insetBy(dx: offset, dy: offset)
         return hitFrame.contains(point)
     }
 }
