@@ -77,6 +77,7 @@ public protocol TrimmerViewDelegate: class {
     private let rightHandleKnob = UIImageView()
     private let leftMaskView = UIView()
     private let rightMaskView = UIView()
+    private let positionBarBackgroundView = UIView()
 
     // MARK: Constraints
 
@@ -85,6 +86,8 @@ public protocol TrimmerViewDelegate: class {
     private var leftConstraint: NSLayoutConstraint?
     private var rightConstraint: NSLayoutConstraint?
     private var positionConstraint: NSLayoutConstraint?
+    private var centerHandlerLeftConstraint: NSLayoutConstraint?
+    private var centerHandlerRightConstraint: NSLayoutConstraint?
 
     public var handleWidth: CGFloat = 10
 
@@ -122,7 +125,7 @@ public protocol TrimmerViewDelegate: class {
         trimView.layer.borderWidth = 2.0
         trimView.layer.cornerRadius = 2.0
         trimView.translatesAutoresizingMaskIntoConstraints = false
-        trimView.isUserInteractionEnabled = true
+        trimView.isUserInteractionEnabled = false
         addSubview(trimView)
 
         trimView.topAnchor.constraint(equalTo: topAnchor).isActive = true
@@ -199,13 +202,25 @@ public protocol TrimmerViewDelegate: class {
         positionBar.center = CGPoint(x: leftHandleView.frame.maxX, y: center.y)
         positionBar.translatesAutoresizingMaskIntoConstraints = false
 
-        addSubview(positionBar)
+        insertSubview(positionBar, belowSubview: leftHandleView)
 
         positionBar.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
         positionBar.widthAnchor.constraint(equalToConstant: 1).isActive = true
         positionBar.heightAnchor.constraint(equalTo: heightAnchor).isActive = true
         positionConstraint = positionBar.leftAnchor.constraint(equalTo: leftHandleView.rightAnchor, constant: 0)
         positionConstraint?.isActive = true
+
+        positionBarBackgroundView.frame = CGRect(x: 0, y: 0, width: 5, height: frame.height)
+        positionBarBackgroundView.backgroundColor = .white
+        positionBarBackgroundView.alpha = 0.4
+        positionBarBackgroundView.isUserInteractionEnabled = false
+        positionBarBackgroundView.translatesAutoresizingMaskIntoConstraints = false
+        insertSubview(positionBarBackgroundView, belowSubview: positionBar)
+
+        positionBarBackgroundView.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
+        positionBarBackgroundView.widthAnchor.constraint(equalToConstant: 5).isActive = true
+        positionBarBackgroundView.heightAnchor.constraint(equalTo: heightAnchor).isActive = true
+        positionBarBackgroundView.centerXAnchor.constraint(equalTo: positionBar.centerXAnchor).isActive = true
     }
 
     private func setupGestures() {
@@ -213,8 +228,6 @@ public protocol TrimmerViewDelegate: class {
         leftHandleView.addGestureRecognizer(leftPanGestureRecognizer)
         let rightPanGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(TrimmerView.handlePanGesture))
         rightHandleView.addGestureRecognizer(rightPanGestureRecognizer)
-        let centerPanGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(TrimmerView.centerHandlePanGesture))
-        trimView.addGestureRecognizer(centerPanGestureRecognizer)
     }
 
     private func updateMainColor() {
@@ -239,8 +252,19 @@ public protocol TrimmerViewDelegate: class {
             updateSelectedTime(stoppedMoving: false)
         case .changed:
             let translation = gestureRecognizer.translation(in: superView)
-            updateLeftConstraint(with: translation)
-            updateRightConstraint(with: translation)
+            let isLeft = translation.x < 0
+            if isLeft {
+                updateLeftConstraint(with: translation)
+            } else {
+                updateRightConstraint(with: translation)
+            }
+            if let sideConstraint = self.sideConstraint, sideConstraint != 0 {
+                if isLeft {
+                    updateRightConstraint(with: translation)
+                } else {
+                    updateLeftConstraint(with: translation)
+                }
+            }
             updateSelectedTime(stoppedMoving: false)
         case .cancelled, .ended, .failed:
             updateSelectedTime(stoppedMoving: true)
@@ -445,5 +469,22 @@ public protocol TrimmerViewDelegate: class {
     public func setTouchOffset(_ offset: CGFloat) {
         leftHandleView.offset = offset
         rightHandleView.offset = offset
+
+        centerHandleView.backgroundColor = .clear
+        centerHandleView.isUserInteractionEnabled = true
+        centerHandleView.translatesAutoresizingMaskIntoConstraints = false
+        insertSubview(centerHandleView, aboveSubview: trimView)
+
+        centerHandleView.heightAnchor.constraint(equalTo: heightAnchor).isActive = true
+        centerHandlerLeftConstraint = centerHandleView.leftAnchor.constraint(equalTo: trimView.leftAnchor,
+                                                                             constant: 0)
+        centerHandlerLeftConstraint?.isActive = true
+        centerHandlerRightConstraint = centerHandleView.rightAnchor.constraint(equalTo: trimView.rightAnchor,
+                                                                               constant: 0)
+        centerHandlerRightConstraint?.isActive = true
+        centerHandleView.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
+
+        let centerPanGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(TrimmerView.centerHandlePanGesture))
+        centerHandleView.addGestureRecognizer(centerPanGestureRecognizer)
     }
 }

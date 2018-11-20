@@ -28,6 +28,7 @@ class VideoTrimmerViewController: AssetSelectionViewController {
         super.viewDidLoad()
         trimmerView.handleColor = UIColor.white
         trimmerView.mainColor = UIColor.darkGray
+        trimmerView.setTouchOffset(-40)
     }
 
     @IBAction func selectAsset(_ sender: Any) {
